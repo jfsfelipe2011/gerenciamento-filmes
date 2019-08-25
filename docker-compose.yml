@@ -1,0 +1,63 @@
+version: '2'
+services:
+    web:
+        container_name: filmes-web
+        hostname: filmes-web
+        build:
+            context: ./
+            dockerfile: ./config/docker/web.docker
+        volumes:
+            - ./:/var/www
+        links:
+            - app
+    app:
+        container_name: filmes-app
+        hostname: filmes-app
+        build:
+            context: ./
+            dockerfile: ./config/docker/app.docker
+        environment:
+            - DB_HOST=mysql
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - mysql
+    composer:
+        image: composer:1.6
+        network_mode: host
+        container_name: filmes-composer
+        hostname: filmes-composer
+        user: "${UID}:${UID}"
+        command: install --prefer-dist --optimize-autoloader --ignore-platform-reqs
+        volumes:
+            - ./laravel:/app
+            - ${HOME}:${HOME}
+            - /etc/passwd:/etc/passwd:ro
+            - /etc/group:/etc/group:ro
+    mysql:
+        image: mysql/mysql-server:5.7
+        container_name: filmes-mysql
+        hostname: filmes-mysql
+        environment:
+            - MYSQL_DATABASE=homestead
+            - MYSQL_USER=homestead
+            - MYSQL_PASSWORD=secret
+            - MYSQL_ROOT_PASSWORD=secret
+        volumes:
+            - ./laravel/database/sql/:/docker-entrypoint-initdb.d/
+            - /etc/localtime:/etc/localtime
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:4.7
+        container_name: filmes-phpmyadmin
+        hostname: filmes-phpmyadmin
+        links:
+            - mysql
+        environment:
+            - MYSQL_USER=homestead
+            - MYSQL_PASSWORD=secret
+            - MYSQL_ROOT_PASSWORD=secret
+            - PMA_HOST=mysql
+networks:
+    default:
+        external:
+            name: jose

@@ -1,0 +1,16 @@
+FROM php:7-fpm
+
+WORKDIR /var/www
+
+RUN apt-get update && apt-get install -y libmcrypt-dev git zip \
+	&& docker-php-ext-install pdo_mysql
+
+RUN groupadd -g 1000 filmes && \
+    useradd -g root -g filmes -u 1000 filmes && \
+    mkdir /home/filmes && chown -R filmes:filmes /home/filmes
+
+RUN chown -R filmes:filmes /var/www
+
+USER filmes
+
+COPY ./ /var/www
