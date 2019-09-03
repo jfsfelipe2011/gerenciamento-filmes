@@ -39,9 +39,9 @@ services:
         container_name: filmes-mysql
         hostname: filmes-mysql
         environment:
-            - MYSQL_DATABASE=homestead
-            - MYSQL_USER=homestead
-            - MYSQL_PASSWORD=secret
+            - MYSQL_DATABASE=filmes
+            - MYSQL_USER=filmes
+            - MYSQL_PASSWORD=filmes
             - MYSQL_ROOT_PASSWORD=secret
         volumes:
             - ./laravel/database/sql/:/docker-entrypoint-initdb.d/
