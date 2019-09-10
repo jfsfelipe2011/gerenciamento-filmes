@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row" style="margin-bottom:3%">
         <h3>Lista de Atores</h3>
-        <a class="btn btn-primary" style="margin-left:30%" href="#">Novo Ator</a>
+        <a class="btn btn-primary" style="margin-left:70%" href="{{ route('actors.create') }}">Novo Ator</a>
     </div>
     <div class="row">
         <table class="table table-striped" style="text-align:center">
