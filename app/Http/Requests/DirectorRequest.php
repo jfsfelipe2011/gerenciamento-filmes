@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ActorRequest extends FormRequest
+class DirectorRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -39,8 +39,8 @@ class ActorRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required'             => 'O nome do ator é obrigatório!',
-            'name.max'                  => 'O nome do ator deve ter até 100 letras',
+            'name.required'             => 'O nome do diretor é obrigatório!',
+            'name.max'                  => 'O nome do diretor deve ter até 100 letras',
             'date_of_birth.required'    => 'A data de nascimento é obrigatória',
             'date_of_birth.date_format' => 'Formato de data inválido para data de nascimento',
             'date_of_death.date_format' => 'Formato de data inválido para data de falescimento',

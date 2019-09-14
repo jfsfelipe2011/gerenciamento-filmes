@@ -14,4 +14,16 @@ class Director extends Model
     {
         return $this->belongsToMany(Film::class);
     }
+
+    public function getDateOfBirthFormattedAttribute()
+    {
+        return (new \DateTime($this->date_of_birth))->format('d/m/Y');
+    }
+
+    public function getDateOfDeathFormattedAttribute()
+    {
+
+        return is_null($this->date_of_death) ? '-' : (new \DateTime($this->date_of_birth))
+            ->format('d/m/Y');
+    }
 }
