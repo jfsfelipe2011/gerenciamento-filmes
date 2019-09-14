@@ -17,3 +17,4 @@ Route::get('/', 'HomeController@index')->name('home');
 
 Route::resource('actors', 'ActorController')->middleware('auth');
 Route::resource('directors', 'DirectorController')->middleware('auth');
+Route::resource('categories', 'CategoryController')->middleware('auth');
