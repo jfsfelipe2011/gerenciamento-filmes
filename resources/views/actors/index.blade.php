@@ -7,6 +7,9 @@
         <a class="btn btn-primary" style="margin-left:70%" href="{{ route('actors.create') }}">Novo Ator</a>
     </div>
     <div class="row">
+        @include('success.success-form')
+        @include('errors.errors')
+
         <table class="table table-striped" style="text-align:center">
             <thead>
             <tr>
@@ -37,16 +40,17 @@
                                 @endforeach
                             @else
                                 <li>Nenhum cadastrado</li>
-                            @endif            
+                            @endif
                         </ul>
                     </td>
                     <td>
                         <ul class="list-inline list-small">
                             <li>
-                                <a class="btn btn-link btn-link-small" href="#">Editar</a>
+                                <a class="btn btn-link btn-link-small"
+                                   href="{{ route('actors.edit', ['actor' => $actor->id]) }}">Editar</a>
                             </li>
                             <li>
-                                <form method="POST" action="#">
+                                <form method="POST" action="{{ route('actors.destroy', ['actor' => $actor->id]) }}">
                                     {{ csrf_field() }}
                                     {{ method_field('DELETE') }}
                                     <button class="btn btn-link btn-link-small" type="submit">Excluir</button>

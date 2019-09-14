@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ActorRequest;
 use Illuminate\Http\Request;
 use App\Actor;
 
@@ -35,9 +36,14 @@ class ActorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ActorRequest $request)
     {
-        //
+        $data = $request->all();
+        Actor::create($data);
+
+        return redirect()
+            ->route('actors.index')
+            ->with('success', 'Ator criado com sucesso!');
     }
 
     /**
@@ -48,7 +54,7 @@ class ActorController extends Controller
      */
     public function show($id)
     {
-        //
+        //Não implementado
     }
 
     /**
@@ -59,7 +65,12 @@ class ActorController extends Controller
      */
     public function edit($id)
     {
-        //
+        if (!($actor = Actor::find($id))) {
+            return back()
+                ->with('errors', 'Ator não encontrado');
+        }
+
+        return view('actors.edit', compact('actor'));
     }
 
     /**
@@ -69,9 +80,21 @@ class ActorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ActorRequest $request, $id)
     {
-        //
+        if (!($actor = Actor::find($id))) {
+            return back()
+                ->with('errors', 'Ator não encontrado');
+        }
+
+        $data = $request->all();
+
+        $actor->fill($data);
+        $actor->save();
+
+        return redirect()
+            ->route('actors.index')
+            ->with('success', 'Ator alterado com sucesso!');
     }
 
     /**
@@ -82,6 +105,14 @@ class ActorController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if (!($actor = Actor::find($id))) {
+            return back()
+                ->with('errors', 'Ator não encontrado');
+        }
+
+        $actor->delete();
+        return redirect()
+            ->route('actors.index')
+            ->with('success', 'Ator excluído com sucesso!');
     }
 }

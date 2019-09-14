@@ -44,7 +44,7 @@ services:
             - MYSQL_PASSWORD=filmes
             - MYSQL_ROOT_PASSWORD=secret
         volumes:
-            - ./laravel/database/sql/:/docker-entrypoint-initdb.d/
+            - ./database/sql/:/docker-entrypoint-initdb.d/
             - /etc/localtime:/etc/localtime
     phpmyadmin:
         image: phpmyadmin/phpmyadmin:4.7
