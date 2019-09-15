@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actor;
 use App\Director;
 use App\Http\Requests\FilmRequest;
+use App\Stock;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Film;
@@ -147,6 +148,10 @@ class FilmController extends Controller
                 ->with('errors', 'Filme não encontrado');
         }
 
+        if ($film->stock instanceof Stock) {
+            return back()
+                ->with('errors', 'Esse filme tem um estoque, não pode ser excluído');
+        }
 
         $film->actors()->detach();
         $film->directors()->detach();
