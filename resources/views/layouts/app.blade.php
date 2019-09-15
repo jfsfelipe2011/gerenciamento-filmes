@@ -56,6 +56,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('films.index') }}">{{ __('Filmes') }}</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('stocks.index') }}">{{ __('Estoque') }}</a>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>

@@ -19,3 +19,4 @@ Route::resource('actors', 'ActorController')->middleware('auth');
 Route::resource('directors', 'DirectorController')->middleware('auth');
 Route::resource('categories', 'CategoryController')->middleware('auth');
 Route::resource('films', 'FilmController')->middleware('auth');
+Route::resource('stocks', 'StockController')->middleware('auth');
