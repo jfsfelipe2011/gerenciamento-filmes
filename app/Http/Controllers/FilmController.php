@@ -153,6 +153,11 @@ class FilmController extends Controller
                 ->with('errors', 'Esse filme tem um estoque, não pode ser excluído');
         }
 
+        if (count($film->rents) > 0) {
+            return back()
+                ->with('errors', 'Esse filme tem operações de aluguel e não pode ser excluído');
+        }
+
         $film->actors()->detach();
         $film->directors()->detach();
         $film->delete();
