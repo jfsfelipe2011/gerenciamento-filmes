@@ -22,4 +22,14 @@ class Customer extends Model
     {
         return $this->hasMany(Rent::class);
     }
+
+    public function getDocumentFormattedAttribute()
+    {
+        return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/','$1.$2.$3-$4', $this->document);
+    }
+
+    public function getPaymentFormattedAttribute()
+    {
+        return $this->payment === self::BILLET ? 'Boleto' : 'Cartão de Crédito';
+    }
 }

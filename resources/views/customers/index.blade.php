@@ -34,8 +34,8 @@
                     <td>{{ $customer->id }}</td>
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->address }}</td>
-                    <td>{{ $customer->document }}</td>
-                    <td>{{ $customer->payment }}</td>
+                    <td>{{ $customer->document_formatted }}</td>
+                    <td>{{ $customer->payment_formatted }}</td>
                     <td>
                         <ul class="list-inline list-small">
                             <li>
