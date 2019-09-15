@@ -22,7 +22,6 @@ class Actor extends Model
 
     public function getDateOfDeathFormattedAttribute()
     {
-
         return is_null($this->date_of_death) ? '-' : (new \DateTime($this->date_of_birth))
             ->format('d/m/Y');
     }

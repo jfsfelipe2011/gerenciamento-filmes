@@ -2,9 +2,19 @@
 
 @section('content')
 <div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Diretores</li>
+        </ol>
+    </nav>
     <div class="row" style="margin-bottom:3%">
-        <h3>Lista de Diretores</h3>
-        <a class="btn btn-primary" style="margin-left:70%" href="{{ route('directors.create') }}">Novo Diretor</a>
+        <div class="col-10">
+            <h3>Lista de Diretores</h3>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-primary" href="{{ route('directors.create') }}">Novo Diretor</a>
+        </div>
     </div>
     <div class="row">
         @include('success.success-form')
@@ -35,7 +45,8 @@
                             @if(count($director->films) > 0)
                                 @foreach($director->films as $film)
                                     <li>
-                                        <a class="btn btn-link btn-link-small" href="#">{{ $film->name }}</a>
+                                        <a class="btn btn-link btn-link-small"
+                                           href="{{ route('films.show', ['film' => $film->id]) }}">{{ $film->name }}</a>
                                     </li>
                                 @endforeach
                             @else

@@ -2,9 +2,19 @@
 
 @section('content')
 <div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Categorias</li>
+        </ol>
+    </nav>
     <div class="row" style="margin-bottom:3%">
-        <h3>Lista de Categorias</h3>
-        <a class="btn btn-primary" style="margin-left:70%" href="{{ route('categories.create') }}">Nova Categoria</a>
+        <div class="col-10">
+            <h3>Lista de Categorias</h3>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-primary" href="{{ route('categories.create') }}">Nova Categoria</a>
+        </div>
     </div>
     <div class="row">
         @include('success.success-form')

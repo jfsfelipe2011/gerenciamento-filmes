@@ -17,7 +17,7 @@ class CreateFilmsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->text('description');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->integer('duration');
             $table->date('release_date');
             $table->unsignedBigInteger('category_id');

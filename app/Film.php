@@ -34,4 +34,9 @@ class Film extends Model
     {
         return $this->belongsToMany(Rent::class);
     }
+
+    public function getReleaseDateFormattedAttribute()
+    {
+        return (new \DateTime($this->release_date))->format('d/m/Y');
+    }
 }

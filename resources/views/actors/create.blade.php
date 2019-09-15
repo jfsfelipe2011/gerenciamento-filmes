@@ -2,9 +2,15 @@
 
 @section('content')
 <div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('actors.index') }}">Atores</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Novo</li>
+        </ol>
+    </nav>
     <div class="row" style="margin-bottom:3%">
         <h3>Novo Ator</h3>
-        <a class="btn btn-primary" style="margin-left:70%" href="{{ route('actors.index') }}">Voltar</a>
     </div>
 
     @include('errors.errors-form')

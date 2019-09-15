@@ -2,9 +2,13 @@
 
 @section('content')
 <div class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('categories.index') }}">Categorias</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Novo</li>
+    </ol>
     <div class="row" style="margin-bottom:3%">
         <h3>Nova Categoria</h3>
-        <a class="btn btn-primary" style="margin-left:70%" href="{{ route('categories.index') }}">Voltar</a>
     </div>
 
     @include('errors.errors-form')
