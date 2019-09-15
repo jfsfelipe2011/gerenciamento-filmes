@@ -29,3 +29,4 @@ Route::put('stocks/{id}/update-quantity', 'StockController@updateQuantity')
 Route::get('customers', 'CustomerController@index')->name('customers.index')->middleware('auth');
 Route::put('rents/{id}/cancel', 'RentController@cancel')->name('rents.cancel')->middleware('auth');
 Route::put('rents/{id}/finish', 'RentController@finish')->name('rents.finish')->middleware('auth');
+Route::get('customer/{id}/rents', 'CustomerController@showRents')->name('customers.show.rents')->middleware('auth');

@@ -40,7 +40,7 @@
                         <ul class="list-inline list-small">
                             <li>
                                 <a class="btn btn-link btn-link-small"
-                                   href="#">Ver Aluguéis</a>
+                                   href="{{ route('customers.show.rents', ['customer' => $customer->id]) }}">Ver Alugueis</a>
                             </li>
                         </ul>
                     </td>
