@@ -17,6 +17,7 @@ class CreateRentsTable extends Migration
             $table->bigIncrements('id');
             $table->date('start_date');
             $table->date('end_date');
+            $table->date('delivery_date')->nullable();
             $table->enum('status', \App\Rent::VALID_STATUS);
             $table->float('value');
             $table->unsignedBigInteger('customer_id');

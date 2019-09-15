@@ -28,7 +28,9 @@
                     <th>Filmes</th>
                     <th>Inicio</th>
                     <th>Fim</th>
+                    <th>Entrega</th>
                     <th>Valor</th>
+                    <th>Status</th>
                     <th>Ação</th>
                 </tr>
                 </thead>
@@ -51,26 +53,33 @@
                                 @endif
                             </ul>
                         </td>
-                        <td>{{ $rent->start_date }}</td>
-                        <td>{{ $rent->end_date }}</td>
+                        <td>{{ $rent->start_date_formatted }}</td>
+                        <td>{{ $rent->end_date_formatted }}</td>
+                        <td>{{ $rent->delivery_date_formatted }}</td>
                         <td>{{ $rent->value }}</td>
+                        <td>{{ $rent->status_formatted }}</td>
                         <td>
                             <ul class="list-inline list-small">
                                 <li>
                                     <a class="btn btn-link btn-link-small"
                                        href="{{ route('rents.show', ['rent' => $rent->id]) }}">Ver</a>
                                 </li>
+                                @if($rent->status === \App\Rent::STATUS_RENTED || $rent->status === \App\Rent::STATUS_LATE)
                                 <li>
-                                    <a class="btn btn-link btn-link-small"
-                                       href="{{ route('rents.edit', ['rent' => $rent->id]) }}">Editar</a>
-                                </li>
-                                <li>
-                                    <form method="POST" action="{{ route('rents.destroy', ['rent' => $rent->id]) }}">
+                                    <form method="POST" action="{{ route('rents.cancel', ['rent' => $rent->id]) }}">
                                         {{ csrf_field() }}
-                                        {{ method_field('DELETE') }}
-                                        <button class="btn btn-link btn-link-small" type="submit">Excluir</button>
+                                        {{ method_field('PUT') }}
+                                        <button class="btn btn-link btn-link-small" type="submit">Cancelar</button>
                                     </form>
                                 </li>
+                                <li>
+                                    <form method="POST" action="{{ route('rents.finish', ['rent' => $rent->id]) }}">
+                                        {{ csrf_field() }}
+                                        {{ method_field('PUT') }}
+                                        <button class="btn btn-link btn-link-small" type="submit">Encerrar</button>
+                                    </form>
+                                </li>
+                                @endif
                             </ul>
                         </td>
                     </tr>

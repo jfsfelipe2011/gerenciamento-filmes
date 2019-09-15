@@ -48,4 +48,12 @@ class Film extends Model
             ->whereNull('stocks.id')
             ->pluck('films.name', 'films.id');
     }
+
+    public static function getFilmsForRent()
+    {
+        return DB::table('films')
+            ->Join('stocks', 'films.id', '=', 'stocks.film_id')
+            ->where('stocks.quantity', '>', 0)
+            ->pluck('films.name', 'films.id');
+    }
 }

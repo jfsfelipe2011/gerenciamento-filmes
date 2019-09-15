@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Film;
 use App\Http\Requests\RentRequest;
 use Illuminate\Http\Request;
 use App\Rent;
@@ -38,12 +39,34 @@ class RentController extends Controller
      */
     public function store(RentRequest $request)
     {
-        /*$data = $request->all();
-        Actor::create($data);
+        $data = $request->all();
+        $films = Film::find($data['films']);
+
+        $value = 0;
+        foreach ($films as $film) {
+            $stock = $film->stock;
+
+            if ($stock->quantity === 0) {
+                return redirect()
+                    ->route('rents.index')
+                    ->with('errors', 'Filme escolhido não está disponível para aluguel');
+            }
+
+            $stock->quantity -= 1;
+            $stock->save();
+
+            $value += $stock->value;
+        }
+
+        $data['value']  = $value;
+        $data['status'] = Rent::STATUS_RENTED;
+
+        $rent = Rent::create($data);
+        $rent->films()->attach($films);
 
         return redirect()
-            ->route('actors.index')
-            ->with('success', 'Ator criado com sucesso!');*/
+            ->route('rents.index')
+            ->with('success', 'Aluguel criado com sucesso!');
     }
 
     /**
@@ -54,7 +77,12 @@ class RentController extends Controller
      */
     public function show($id)
     {
-        //Não implementado
+        if (!($rent = Rent::find($id))) {
+            return back()
+                ->with('errors', 'Aluguel não encontrado');
+        }
+
+        return view('rents.show', compact('rent'));
     }
 
     /**
@@ -65,12 +93,7 @@ class RentController extends Controller
      */
     public function edit($id)
     {
-        /*if (!($actor = Actor::find($id))) {
-            return back()
-                ->with('errors', 'Ator não encontrado');
-        }
-
-        return view('actors.edit', compact('actor'));*/
+        //Não será usado
     }
 
     /**
@@ -82,19 +105,7 @@ class RentController extends Controller
      */
     public function update(RentRequest $request, $id)
     {
-        /*if (!($actor = Actor::find($id))) {
-            return back()
-                ->with('errors', 'Ator não encontrado');
-        }
-
-        $data = $request->all();
-
-        $actor->fill($data);
-        $actor->save();
-
-        return redirect()
-            ->route('actors.index')
-            ->with('success', 'Ator alterado com sucesso!');*/
+        //Não será usado
     }
 
     /**
@@ -105,14 +116,49 @@ class RentController extends Controller
      */
     public function destroy($id)
     {
-        /*if (!($actor = Actor::find($id))) {
+        //Não será usado
+    }
+
+    public function cancel($id)
+    {
+        if (!($rent = Rent::find($id))) {
             return back()
-                ->with('errors', 'Ator não encontrado');
+                ->with('errors', 'Aluguel não encontrado');
         }
 
-        $actor->delete();
+        $rent->status = Rent::STATUS_CANCELED;
+        $rent->save();
+
+        foreach ($rent->films as $film) {
+            $stock = $film->stock;
+            $stock->quantity += 1;
+            $stock->save();
+        }
+
         return redirect()
-            ->route('actors.index')
-            ->with('success', 'Ator excluído com sucesso!');*/
+            ->route('rents.index')
+            ->with('success', 'Aluguel cancelado com sucesso!');
+    }
+
+    public function finish($id)
+    {
+        if (!($rent = Rent::find($id))) {
+            return back()
+                ->with('errors', 'Aluguel não encontrado');
+        }
+
+        $rent->status        = Rent::STATUS_FINISHED;
+        $rent->delivery_date = (new \DateTime())->format('Y-m-d');
+        $rent->save();
+
+        foreach ($rent->films as $film) {
+            $stock = $film->stock;
+            $stock->quantity += 1;
+            $stock->save();
+        }
+
+        return redirect()
+            ->route('rents.index')
+            ->with('success', 'Aluguel encerrado com sucesso!');
     }
 }

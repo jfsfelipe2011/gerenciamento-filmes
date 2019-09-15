@@ -1,20 +1,20 @@
-<!--<div class="form-group">
-    {!! Form::label('name', 'Nome') !!}
-    {!! Form::text('name', null, ['class' => 'form-control']) !!}
+<div class="form-group">
+    {!! Form::label('start_date', 'Data de Inicio') !!}
+    {!! Form::date('start_date', null, ['class' => 'form-control']) !!}
 </div>
 
 <div class="form-group">
-    {!! Form::label('date_of_birth', 'Data de Nascimento') !!}
-    {!! Form::date('date_of_birth', null, ['class' => 'form-control']) !!}
+    {!! Form::label('end_date', 'Data de Fim') !!}
+    {!! Form::date('end_date', null, ['class' => 'form-control']) !!}
 </div>
 
 <div class="form-group">
-    {!! Form::label('date_of_death', 'Data de Falecimento') !!}
-    {!! Form::date('date_of_death', null, ['class' => 'form-control']) !!}
+    {!! Form::label('customer_id', 'Cliente') !!}
+    {!! Form::select('customer_id', \App\Customer::pluck('name', 'id'), null, ['class' => 'form-control']) !!}
 </div>
 
 <div class="form-group">
-    {!! Form::label('oscar', 'Quantidade de Oscars') !!}
-    {!! Form::number('oscar', null, ['class' => 'form-control', 'min' => 0, 'max' => 100]) !!}
+    {!! Form::label('films', 'Filmes') !!}
+    {!! Form::select('films[]', \App\Film::getFilmsForRent(), null,
+    ['class' => 'form-control', 'multiple' => 'multiple']) !!}
 </div>
--->
