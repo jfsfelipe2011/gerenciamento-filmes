@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Rent;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -24,8 +25,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->call(function () {
+            $rentsExpired = Rent::getRentsExpireds();
+
+            foreach ($rentsExpired as $rent) {
+                $rent->status = Rent::STATUS_LATE;
+                $rent->save();
+            }
+        })->everyMinute();
+          //->dailyAt('00:00');
     }
 
     /**

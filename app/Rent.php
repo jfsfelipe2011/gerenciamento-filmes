@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Rent extends Model
 {
@@ -98,5 +99,13 @@ class Rent extends Model
             default:
                 return 'Status desconhecido';
         }
+    }
+
+    public static function getRentsExpireds()
+    {
+        $now = new \DateTime();
+
+        return Rent::where('end_date', '<', $now->format('Y-m-d'))
+            ->get();
     }
 }
