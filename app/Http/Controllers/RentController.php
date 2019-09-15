@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Film;
 use App\Http\Requests\RentRequest;
-use Illuminate\Http\Request;
 use App\Rent;
+use Illuminate\Support\Facades\DB;
+
 
 class RentController extends Controller
 {
@@ -42,27 +43,29 @@ class RentController extends Controller
         $data = $request->all();
         $films = Film::find($data['films']);
 
-        $value = 0;
-        foreach ($films as $film) {
-            $stock = $film->stock;
+        DB::transaction(function () use ($data, $films) {
+            $value = 0;
+            foreach ($films as $film) {
+                $stock = $film->stock;
 
-            if ($stock->quantity === 0) {
-                return redirect()
-                    ->route('rents.index')
-                    ->with('errors', 'Filme escolhido não está disponível para aluguel');
+                if ($stock->quantity === 0) {
+                    return redirect()
+                        ->route('rents.index')
+                        ->with('errors', 'Filme escolhido não está disponível para aluguel');
+                }
+
+                $stock->quantity -= 1;
+                $stock->save();
+
+                $value += $stock->value;
             }
 
-            $stock->quantity -= 1;
-            $stock->save();
+            $data['value']  = $value;
+            $data['status'] = Rent::STATUS_RENTED;
 
-            $value += $stock->value;
-        }
-
-        $data['value']  = $value;
-        $data['status'] = Rent::STATUS_RENTED;
-
-        $rent = Rent::create($data);
-        $rent->films()->attach($films);
+            $rent = Rent::create($data);
+            $rent->films()->attach($films);
+        });
 
         return redirect()
             ->route('rents.index')
@@ -126,14 +129,16 @@ class RentController extends Controller
                 ->with('errors', 'Aluguel não encontrado');
         }
 
-        $rent->status = Rent::STATUS_CANCELED;
-        $rent->save();
+        DB::transaction(function () use ($rent) {
+            $rent->status = Rent::STATUS_CANCELED;
+            $rent->save();
 
-        foreach ($rent->films as $film) {
-            $stock = $film->stock;
-            $stock->quantity += 1;
-            $stock->save();
-        }
+            foreach ($rent->films as $film) {
+                $stock = $film->stock;
+                $stock->quantity += 1;
+                $stock->save();
+            }
+        });
 
         return redirect()
             ->route('rents.index')
@@ -147,15 +152,17 @@ class RentController extends Controller
                 ->with('errors', 'Aluguel não encontrado');
         }
 
-        $rent->status        = Rent::STATUS_FINISHED;
-        $rent->delivery_date = (new \DateTime())->format('Y-m-d');
-        $rent->save();
+        DB::transaction(function () use ($rent) {
+            $rent->status        = Rent::STATUS_FINISHED;
+            $rent->delivery_date = (new \DateTime())->format('Y-m-d');
+            $rent->save();
 
-        foreach ($rent->films as $film) {
-            $stock = $film->stock;
-            $stock->quantity += 1;
-            $stock->save();
-        }
+            foreach ($rent->films as $film) {
+                $stock = $film->stock;
+                $stock->quantity += 1;
+                $stock->save();
+            }
+        });
 
         return redirect()
             ->route('rents.index')

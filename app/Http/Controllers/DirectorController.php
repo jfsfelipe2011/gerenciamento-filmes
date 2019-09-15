@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DirectorRequest;
-use Illuminate\Http\Request;
 use App\Director;
 
 class DirectorController extends Controller

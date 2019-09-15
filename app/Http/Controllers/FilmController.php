@@ -7,8 +7,8 @@ use App\Director;
 use App\Http\Requests\FilmRequest;
 use App\Stock;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
 use App\Film;
+use Illuminate\Support\Facades\DB;
 
 class FilmController extends Controller
 {
@@ -55,10 +55,11 @@ class FilmController extends Controller
             $data['image'] = $path;
         }
 
-        /** @var Film $film */
-        $film = Film::create($data);
-        $film->actors()->attach($actors);
-        $film->directors()->attach($directors);
+        DB::transaction(function () use ($data, $actors, $directors) {
+            $film = Film::create($data);
+            $film->actors()->attach($actors);
+            $film->directors()->attach($directors);
+        });
 
         return redirect()
             ->route('films.index')
@@ -124,10 +125,12 @@ class FilmController extends Controller
             $data['image'] = $path;
         }
 
-        $film->fill($data);
-        $film->save();
-        $film->actors()->sync($actors);
-        $film->directors()->sync($directors);
+        DB::transaction(function () use ($film, $data, $actors, $directors) {
+            $film->fill($data);
+            $film->save();
+            $film->actors()->sync($actors);
+            $film->directors()->sync($directors);
+        });
 
 
         return redirect()
@@ -158,9 +161,12 @@ class FilmController extends Controller
                 ->with('errors', 'Esse filme tem operações de aluguel e não pode ser excluído');
         }
 
-        $film->actors()->detach();
-        $film->directors()->detach();
-        $film->delete();
+        DB::transaction(function () use ($film) {
+            $film->actors()->detach();
+            $film->directors()->detach();
+            $film->delete();
+        });
+
         return redirect()
             ->route('films.index')
             ->with('success', 'Filme excluído com sucesso!');
