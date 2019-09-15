@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Film extends Model
 {
@@ -38,5 +39,13 @@ class Film extends Model
     public function getReleaseDateFormattedAttribute()
     {
         return (new \DateTime($this->release_date))->format('d/m/Y');
+    }
+
+    public static function getFilmsNotStock()
+    {
+        return DB::table('films')
+            ->leftJoin('stocks', 'films.id', '=', 'stocks.film_id')
+            ->whereNull('stocks.id')
+            ->pluck('films.name', 'films.id');
     }
 }

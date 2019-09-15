@@ -20,3 +20,8 @@ Route::resource('directors', 'DirectorController')->middleware('auth');
 Route::resource('categories', 'CategoryController')->middleware('auth');
 Route::resource('films', 'FilmController')->middleware('auth');
 Route::resource('stocks', 'StockController')->middleware('auth');
+
+// Custom routes
+Route::get('/stocks/{id}/add', 'StockController@add')->name('stocks.add')->middleware('auth');
+Route::put('/stocks/{id}/update-quantity', 'StockController@updateQuantity')
+    ->name('stocks.update.quantity')->middleware('auth');

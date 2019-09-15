@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Film;
 use App\Http\Requests\StockRequest;
 use Illuminate\Http\Request;
 use App\Stock;
@@ -27,6 +28,11 @@ class StockController extends Controller
      */
     public function create()
     {
+        if (count(Film::getFilmsNotStock()) === 0) {
+            return back()
+                ->with('errors', 'Não existe nenhum filme sem estoque');
+        }
+
         return view('stocks.create');
     }
 
@@ -114,5 +120,32 @@ class StockController extends Controller
         return redirect()
             ->route('stocks.index')
             ->with('success', 'Estoque excluído com sucesso!');
+    }
+
+    public function add($id)
+    {
+        if (!($stock = Stock::find($id))) {
+            return back()
+                ->with('errors', 'Estoque não encontrado');
+        }
+
+        return view('stocks.add', compact('stock'));
+    }
+
+    public function updateQuantity(Request $request, $id)
+    {
+        if (!($stock = Stock::find($id))) {
+            return back()
+                ->with('errors', 'Estoque não encontrado');
+        }
+
+        $quantity = $request->get('quantity');
+
+        $stock->quantity += $quantity;
+        $stock->save();
+
+        return redirect()
+            ->route('stocks.index')
+            ->with('success', 'Quantidade adicionada com sucesso!');
     }
 }

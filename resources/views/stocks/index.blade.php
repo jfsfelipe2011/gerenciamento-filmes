@@ -41,6 +41,10 @@
                         <ul class="list-inline list-small">
                             <li>
                                 <a class="btn btn-link btn-link-small"
+                                   href="{{ route('stocks.add', ['stock' => $stock->id]) }}">Adicionar</a>
+                            </li>
+                            <li>
+                                <a class="btn btn-link btn-link-small"
                                    href="{{ route('stocks.edit', ['stock' => $stock->id]) }}">Editar</a>
                             </li>
                             <li>
