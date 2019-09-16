@@ -4,6 +4,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Class DirectorRequest
+ * @package App\Http\Requests
+ */
 class DirectorRequest extends FormRequest
 {
     /**

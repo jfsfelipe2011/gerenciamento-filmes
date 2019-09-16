@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DirectorRequest;
 use App\Director;
 
+/**
+ * Class DirectorController
+ * @package App\Http\Controllers
+ */
 class DirectorController extends Controller
 {
     /**

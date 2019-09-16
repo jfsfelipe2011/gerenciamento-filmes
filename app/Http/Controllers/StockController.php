@@ -7,6 +7,10 @@ use App\Http\Requests\StockRequest;
 use Illuminate\Http\Request;
 use App\Stock;
 
+/**
+ * Class StockController
+ * @package App\Http\Controllers
+ */
 class StockController extends Controller
 {
     /**
@@ -122,6 +126,10 @@ class StockController extends Controller
             ->with('success', 'Estoque excluído com sucesso!');
     }
 
+    /**
+     * @param int $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
     public function add($id)
     {
         if (!($stock = Stock::find($id))) {
@@ -132,6 +140,11 @@ class StockController extends Controller
         return view('stocks.add', compact('stock'));
     }
 
+    /**
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function updateQuantity(Request $request, $id)
     {
         if (!($stock = Stock::find($id))) {

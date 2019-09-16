@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Customer;
 
+/**
+ * Class CustomerController
+ * @package App\Http\Controllers
+ */
 class CustomerController extends Controller
 {
     /**
@@ -18,6 +22,10 @@ class CustomerController extends Controller
         return view('customers.index', compact('customers'));
     }
 
+    /**
+     * @param int $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
     public function showRents($id)
     {
         if (!($customer = Customer::find($id))) {

@@ -4,13 +4,25 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Rent
+ * @package App
+ */
 class Rent extends Model
 {
+    /** @var string */
     const STATUS_RENTED   = 'rented';
+
+    /** @var string */
     const STATUS_FINISHED = 'finished';
+
+    /** @var string */
     const STATUS_LATE     = 'late';
+
+    /** @var string */
     const STATUS_CANCELED = 'canceled';
 
+    /** @var array */
     const VALID_STATUS = [
         self::STATUS_RENTED,
         self::STATUS_FINISHED,
@@ -18,36 +30,63 @@ class Rent extends Model
         self::STATUS_CANCELED
     ];
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'start_date', 'end_date', 'delivery_date', 'status', 'value', 'customer_id'
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function films()
     {
         return $this->belongsToMany(Film::class);
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function getStartDateFormattedAttribute()
     {
         return (new \DateTime($this->start_date))->format('d/m/Y');
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function getEndDateFormattedAttribute()
     {
         return (new \DateTime($this->end_date))->format('d/m/Y');
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function getDeliveryDateFormattedAttribute()
     {
         return is_null($this->delivery_date) ? '-' : (new \DateTime($this->delivery_date))
             ->format('d/m/Y');
     }
 
+    /**
+     * @return float|int
+     * @throws \Exception
+     */
     public function daysOfDelay()
     {
         if ($this->status === self::STATUS_CANCELED) {
@@ -73,6 +112,10 @@ class Rent extends Model
         return $days < 0 ? $days * -1 : 0;
     }
 
+    /**
+     * @return float|int
+     * @throws \Exception
+     */
     public function daysOfRent()
     {
         $start_Date = new \DateTime($this->start_date);
@@ -84,6 +127,9 @@ class Rent extends Model
         return $days * -1;
     }
 
+    /**
+     * @return string
+     */
     public function getStatusFormattedAttribute()
     {
         switch ($this->status) {
@@ -100,6 +146,10 @@ class Rent extends Model
         }
     }
 
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
     public static function getRentsExpireds()
     {
         $now = new \DateTime();

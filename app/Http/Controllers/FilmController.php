@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Storage;
 use App\Film;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class FilmController
+ * @package App\Http\Controllers
+ */
 class FilmController extends Controller
 {
     /**

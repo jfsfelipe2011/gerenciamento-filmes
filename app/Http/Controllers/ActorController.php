@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ActorRequest;
 use App\Actor;
 
+/**
+ * Class ActorController
+ * @package App\Http\Controllers
+ */
 class ActorController extends Controller
 {
     /**

@@ -7,7 +7,10 @@ use App\Http\Requests\RentRequest;
 use App\Rent;
 use Illuminate\Support\Facades\DB;
 
-
+/**
+ * Class RentController
+ * @package App\Http\Controllers
+ */
 class RentController extends Controller
 {
     /**
@@ -122,6 +125,10 @@ class RentController extends Controller
         //Não será usado
     }
 
+    /**
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function cancel($id)
     {
         if (!($rent = Rent::find($id))) {
@@ -145,6 +152,10 @@ class RentController extends Controller
             ->with('success', 'Aluguel cancelado com sucesso!');
     }
 
+    /**
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function finish($id)
     {
         if (!($rent = Rent::find($id))) {
