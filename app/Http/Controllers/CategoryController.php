@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
 use App\Category;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class CategoryController
@@ -18,7 +19,23 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::paginate(10);
+        try {
+            $categories = Category::paginate(10);
+
+            Log::channel('app')->info(
+                sprintf('Carregado %s categorias da base de dados', count($categories))
+            );
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Não foi possível carregar os categorias',
+                [
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('home')
+                ->with('errors', 'Não foi possível acessar a página de categorias');
+        }
 
         return view('categories.index', compact('categories'));
     }
@@ -42,7 +59,23 @@ class CategoryController extends Controller
     public function store(CategoryRequest $request)
     {
         $data = $request->all();
-        Category::create($data);
+
+        try {
+            $category = Category::create($data);
+
+            Log::channel('app')->info('Categoria criada com sucesso', ['categoria' => $category]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao criar uma nova categoria',
+                [
+                    'data' => $data,
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('categories.index')
+                ->with('errors', 'Não foi possível criar uma nova categoria');
+        }
 
         return redirect()
             ->route('categories.index')
@@ -58,6 +91,9 @@ class CategoryController extends Controller
     public function show($id)
     {
         //Não implementado
+        return redirect()
+            ->route('categories.index')
+            ->with('error', 'Página não disponível');
     }
 
     /**
@@ -73,6 +109,8 @@ class CategoryController extends Controller
                 ->with('errors', 'Categoria não encontrada');
         }
 
+        Log::channel('app')->info('Categoria carregada com sucesso', ['categoria' => $category]);
+
         return view('categories.edit', compact('category'));
     }
 
@@ -86,14 +124,33 @@ class CategoryController extends Controller
     public function update(CategoryRequest $request, $id)
     {
         if (!($category = Category::find($id))) {
-            return back()
+            return redirect()
+                ->route('categories.index')
                 ->with('errors', 'Categoria não encontrada');
         }
 
+        Log::channel('app')->info('Categoria carregada com sucesso', ['categoria' => $category]);
+
         $data = $request->all();
 
-        $category->fill($data);
-        $category->save();
+        try {
+            $category->fill($data);
+            $category->save();
+
+            Log::channel('app')->info('Categoria atualizada com sucesso', ['categoria' => $category]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao atualizar uma categoria',
+                [
+                    'data'      => $data,
+                    'categoria' => $category,
+                    'erro'      => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('categories.index')
+                ->with('errors', 'Não foi possível atualizar categoria');
+        }
 
         return redirect()
             ->route('categories.index')
@@ -113,7 +170,25 @@ class CategoryController extends Controller
                 ->with('errors', 'Categoria não encontrada');
         }
 
-        $category->delete();
+        Log::channel('app')->info('Categoria carregada com sucesso', ['categoria' => $category]);
+
+        try {
+            $category->delete();
+
+            Log::channel('app')->info('Categoria deletada com sucesso', ['categoria' => $category]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao deletar uma categoria',
+                [
+                    'categoria' => $category,
+                    'erro'      => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('categories.index')
+                ->with('errors', 'Não foi possível deletar categoria');
+        }
+
         return redirect()
             ->route('categories.index')
             ->with('success', 'Categoria excluída com sucesso!');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class CustomerController
@@ -17,7 +18,23 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::paginate(10);
+        try {
+            $customers = Customer::paginate(10);
+
+            Log::channel('app')->info(
+                sprintf('Carregado %s clientes da base de dados', count($customers))
+            );
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Não foi possível carregar os clientes',
+                [
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('home')
+                ->with('errors', 'Não foi possível acessar a página de clientes');
+        }
 
         return view('customers.index', compact('customers'));
     }
@@ -33,7 +50,13 @@ class CustomerController extends Controller
                 ->with('errors', 'Cliente não encontrado');
         }
 
+        Log::channel('app')->info('Cliente carregado com sucesso', ['cliente' => $customer]);
+
         $rents = $customer->rents()->paginate(10);
+
+        Log::channel('app')->info(
+            sprintf('Carregado %s alugueis da base de dados', count($rents))
+        );
 
         return view('customers.rents', compact('rents', 'customer'));
     }

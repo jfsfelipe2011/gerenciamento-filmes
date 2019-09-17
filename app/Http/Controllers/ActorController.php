@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ActorRequest;
+use Illuminate\Support\Facades\Log;
 use App\Actor;
 
 /**
@@ -18,7 +19,21 @@ class ActorController extends Controller
      */
     public function index()
     {
-        $actors = Actor::paginate(10);
+        try {
+            $actors = Actor::paginate(10);
+
+            Log::channel('app')->info(sprintf('Carregado %s atores da base de dados', count($actors)));
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Não foi possível carregar os atores',
+                [
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('home')
+                ->with('errors', 'Não foi possível acessar a página de atores');
+        }
 
         return view('actors.index', compact('actors'));
     }
@@ -42,7 +57,23 @@ class ActorController extends Controller
     public function store(ActorRequest $request)
     {
         $data = $request->all();
-        Actor::create($data);
+
+        try {
+            $actor = Actor::create($data);
+
+            Log::channel('app')->info('Ator criado com sucesso', ['ator' => $actor]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao criar um novo ator',
+                [
+                    'data' => $data,
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('actors.index')
+                ->with('errors', 'Não foi possível criar um novo ator');
+        }
 
         return redirect()
             ->route('actors.index')
@@ -58,6 +89,9 @@ class ActorController extends Controller
     public function show($id)
     {
         //Não implementado
+        return redirect()
+            ->route('actors.index')
+            ->with('error', 'Página não disponível');
     }
 
     /**
@@ -73,6 +107,8 @@ class ActorController extends Controller
                 ->with('errors', 'Ator não encontrado');
         }
 
+        Log::channel('app')->info('Ator carregado com sucesso', ['ator' => $actor]);
+
         return view('actors.edit', compact('actor'));
     }
 
@@ -86,14 +122,33 @@ class ActorController extends Controller
     public function update(ActorRequest $request, $id)
     {
         if (!($actor = Actor::find($id))) {
-            return back()
+            return redirect()
+                ->route('actors.index')
                 ->with('errors', 'Ator não encontrado');
         }
 
+        Log::channel('app')->info('Ator carregado com sucesso', ['ator' => $actor]);
+
         $data = $request->all();
 
-        $actor->fill($data);
-        $actor->save();
+        try {
+            $actor->fill($data);
+            $actor->save();
+
+            Log::channel('app')->info('Ator atualizado com sucesso', ['ator' => $actor]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao atualizar um ator',
+                [
+                    'data' => $data,
+                    'ator' => $actor,
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('actors.index')
+                ->with('errors', 'Não foi possível atualizar ator');
+        }
 
         return redirect()
             ->route('actors.index')
@@ -113,7 +168,25 @@ class ActorController extends Controller
                 ->with('errors', 'Ator não encontrado');
         }
 
-        $actor->delete();
+        Log::channel('app')->info('Ator carregado com sucesso', ['ator' => $actor]);
+
+        try {
+            $actor->delete();
+
+            Log::channel('app')->info('Ator deletado com sucesso', ['ator' => $actor]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao deletar um ator',
+                [
+                    'ator' => $actor,
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('actors.index')
+                ->with('errors', 'Não foi possível deletar ator');
+        }
+
         return redirect()
             ->route('actors.index')
             ->with('success', 'Ator excluído com sucesso!');

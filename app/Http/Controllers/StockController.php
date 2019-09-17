@@ -6,6 +6,7 @@ use App\Film;
 use App\Http\Requests\StockRequest;
 use Illuminate\Http\Request;
 use App\Stock;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class StockController
@@ -20,7 +21,23 @@ class StockController extends Controller
      */
     public function index()
     {
-        $stocks = Stock::paginate(10);
+        try {
+            $stocks = Stock::paginate(10);
+
+            Log::channel('app')->info(
+                sprintf('Carregado %s estoques da base de dados', count($stocks))
+            );
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Não foi possível carregar os estoques',
+                [
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('home')
+                ->with('errors', 'Não foi possível acessar a página de estoques');
+        }
 
         return view('stocks.index', compact('stocks'));
     }
@@ -49,7 +66,23 @@ class StockController extends Controller
     public function store(StockRequest $request)
     {
         $data = $request->all();
-        Stock::create($data);
+
+        try {
+            $stock = Stock::create($data);
+
+            Log::channel('app')->info('Estoque criado com sucesso', ['estoque' => $stock]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao criar um novo estoque',
+                [
+                    'data' => $data,
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('stocks.index')
+                ->with('errors', 'Não foi possível criar um novo estoque');
+        }
 
         return redirect()
             ->route('stocks.index')
@@ -65,6 +98,9 @@ class StockController extends Controller
     public function show($id)
     {
         //Não implementado
+        return redirect()
+            ->route('stocks.index')
+            ->with('error', 'Página não disponível');
     }
 
     /**
@@ -79,6 +115,8 @@ class StockController extends Controller
             return back()
                 ->with('errors', 'Estoque não encontrado');
         }
+
+        Log::channel('app')->info('Estoque carregado com sucesso', ['estoque' => $stock]);
 
         return view('stocks.edit', compact('stock'));
     }
@@ -97,10 +135,28 @@ class StockController extends Controller
                 ->with('errors', 'Estoque não encontrado');
         }
 
+        Log::channel('app')->info('Estoque carregado com sucesso', ['estoque' => $stock]);
+
         $data = $request->all();
 
-        $stock->fill($data);
-        $stock->save();
+        try {
+            $stock->fill($data);
+            $stock->save();
+
+            Log::channel('app')->info('Estoque atualizado com sucesso', ['estoque' => $stock]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao atualizar um estoque',
+                [
+                    'data'    => $data,
+                    'estoque' => $stock,
+                    'erro'    => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('stocks.index')
+                ->with('errors', 'Não foi possível atualizar estoque');
+        }
 
         return redirect()
             ->route('stocks.index')
@@ -120,7 +176,25 @@ class StockController extends Controller
                 ->with('errors', 'Estoque não encontrado');
         }
 
-        $stock->delete();
+        Log::channel('app')->info('Estoque carregado com sucesso', ['estoque' => $stock]);
+
+        try {
+            $stock->delete();
+
+            Log::channel('app')->info('Estoque deletado com sucesso', ['estoque' => $stock]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao deletar um estoque',
+                [
+                    'estoque' => $stock,
+                    'erro'    => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('stocks.index')
+                ->with('errors', 'Não foi possível deletar estoque');
+        }
+
         return redirect()
             ->route('stocks.index')
             ->with('success', 'Estoque excluído com sucesso!');
@@ -137,6 +211,8 @@ class StockController extends Controller
                 ->with('errors', 'Estoque não encontrado');
         }
 
+        Log::channel('app')->info('Estoque carregado com sucesso', ['estoque' => $stock]);
+
         return view('stocks.add', compact('stock'));
     }
 
@@ -152,10 +228,28 @@ class StockController extends Controller
                 ->with('errors', 'Estoque não encontrado');
         }
 
+        Log::channel('app')->info('Estoque carregado com sucesso', ['estoque' => $stock]);
+
         $quantity = $request->get('quantity');
 
-        $stock->quantity += $quantity;
-        $stock->save();
+        try {
+            $stock->quantity += $quantity;
+            $stock->save();
+
+            Log::channel('app')->info('Estoque atualizado com sucesso', ['estoque' => $stock]);
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Erro ao atualizar um estoque',
+                [
+                    'data'    => $quantity,
+                    'estoque' => $stock,
+                    'erro'    => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('stocks.index')
+                ->with('errors', 'Não foi possível atualizar estoque');
+        }
 
         return redirect()
             ->route('stocks.index')
