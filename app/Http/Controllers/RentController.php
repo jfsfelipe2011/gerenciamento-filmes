@@ -6,6 +6,7 @@ use App\Film;
 use App\Http\Requests\RentRequest;
 use App\Rent;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class RentController
@@ -20,7 +21,21 @@ class RentController extends Controller
      */
     public function index()
     {
-        $rents = Rent::paginate(10);
+        try {
+            $rents = Rent::paginate(10);
+
+            Log::channel('app')->info(sprintf('Carregado %s alugueis da base de dados', count($rents)));
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Não foi possível carregar os alugueis',
+                [
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('home')
+                ->with('errors', 'Não foi possível acessar a página de alugueis');
+        }
 
         return view('rents.index', compact('rents'));
     }
@@ -44,9 +59,16 @@ class RentController extends Controller
     public function store(RentRequest $request)
     {
         $data = $request->all();
-        $films = Film::find($data['films']);
 
-        DB::transaction(function () use ($data, $films) {
+        try {
+            $films = Film::find($data['films']);
+
+            if (!$films) {
+                throw new \Exception('Filme(s) informado não existem');
+            }
+
+            DB::beginTransaction();
+
             $value = 0;
             foreach ($films as $film) {
                 $stock = $film->stock;
@@ -60,6 +82,13 @@ class RentController extends Controller
                 $stock->quantity -= 1;
                 $stock->save();
 
+                Log::channel('app')->info('Estoque atualizado com sucesso', 
+                    [
+                        'estoque'    => $stock, 
+                        'quantidade' => $stock->quantity
+                    ]
+                );
+
                 $value += $stock->value;
             }
 
@@ -68,7 +97,23 @@ class RentController extends Controller
 
             $rent = Rent::create($data);
             $rent->films()->attach($films);
-        });
+
+            DB::commit();
+            Log::channel('app')->info('Aluguel criado com sucesso', ['rent' => $rent]);
+        } catch (\Throwable $exception) {
+            DB::rollback();
+
+            Log::channel('error')->critical('Erro ao criar um novo aluguel',
+                [
+                    'data' => $data,
+                    'erro' => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('rents.index')
+                ->with('errors', 'Não foi possível criar um novo aluguel');
+        }
 
         return redirect()
             ->route('rents.index')
@@ -88,6 +133,8 @@ class RentController extends Controller
                 ->with('errors', 'Aluguel não encontrado');
         }
 
+        Log::channel('app')->info('Aluguel carregado com sucesso', ['aluguel' => $rent]);
+
         return view('rents.show', compact('rent'));
     }
 
@@ -100,6 +147,9 @@ class RentController extends Controller
     public function edit($id)
     {
         //Não será usado
+        return redirect()
+            ->route('rents.index')
+            ->with('error', 'Página não disponível');
     }
 
     /**
@@ -112,6 +162,9 @@ class RentController extends Controller
     public function update(RentRequest $request, $id)
     {
         //Não será usado
+        return redirect()
+            ->route('rents.index')
+            ->with('error', 'Página não disponível');
     }
 
     /**
@@ -123,6 +176,9 @@ class RentController extends Controller
     public function destroy($id)
     {
         //Não será usado
+        return redirect()
+            ->route('rents.index')
+            ->with('error', 'Página não disponível');
     }
 
     /**
@@ -136,16 +192,45 @@ class RentController extends Controller
                 ->with('errors', 'Aluguel não encontrado');
         }
 
-        DB::transaction(function () use ($rent) {
+        Log::channel('app')->info('Aluguel carregado com sucesso', ['aluguel' => $rent]);
+
+        try {
+            DB::beginTransaction();
+
             $rent->status = Rent::STATUS_CANCELED;
             $rent->save();
+
+            Log::channel('app')->info('Aluguel cancelado com sucesso', ['aluguel' => $rent]);
 
             foreach ($rent->films as $film) {
                 $stock = $film->stock;
                 $stock->quantity += 1;
                 $stock->save();
+
+                Log::channel('app')->info('Estoque atualizado com sucesso', 
+                    [
+                        'estoque'    => $stock, 
+                        'quantidade' => $stock->quantity
+                    ]
+                );
             }
-        });
+
+            DB::commit();
+        } catch (\Throwable $exception) {
+            DB::rollback();
+
+            Log::channel('error')->critical('Erro ao cancelar um novo aluguel',
+                [
+                    'aluguel' => $rent,
+                    'erro'    => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('rents.index')
+                ->with('errors', 'Não foi possível cancelar o aluguel');
+        }
+        
 
         return redirect()
             ->route('rents.index')
@@ -163,17 +248,45 @@ class RentController extends Controller
                 ->with('errors', 'Aluguel não encontrado');
         }
 
-        DB::transaction(function () use ($rent) {
+        Log::channel('app')->info('Aluguel carregado com sucesso', ['aluguel' => $rent]);
+
+        try {
+            DB::beginTransaction();
+
             $rent->status        = Rent::STATUS_FINISHED;
             $rent->delivery_date = (new \DateTime())->format('Y-m-d');
             $rent->save();
+
+            Log::channel('app')->info('Aluguel finalizado com sucesso', ['aluguel' => $rent]);
 
             foreach ($rent->films as $film) {
                 $stock = $film->stock;
                 $stock->quantity += 1;
                 $stock->save();
+
+                Log::channel('app')->info('Estoque atualizado com sucesso', 
+                    [
+                        'estoque'    => $stock, 
+                        'quantidade' => $stock->quantity
+                    ]
+                );
             }
-        });
+
+            DB::commit();
+        } catch (\Throwable $exception) {
+            DB::rollback();
+
+            Log::channel('error')->critical('Erro ao finalizar um novo aluguel',
+                [
+                    'aluguel' => $rent,
+                    'erro'    => $exception->getMessage()
+                ]
+            );
+
+            return redirect()
+                ->route('rents.index')
+                ->with('errors', 'Não foi possível finalizar o aluguel');
+        }    
 
         return redirect()
             ->route('rents.index')

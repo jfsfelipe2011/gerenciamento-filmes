@@ -52,11 +52,24 @@ class CustomerController extends Controller
 
         Log::channel('app')->info('Cliente carregado com sucesso', ['cliente' => $customer]);
 
-        $rents = $customer->rents()->paginate(10);
+        try {
+            $rents = $customer->rents()->paginate(10);
 
-        Log::channel('app')->info(
-            sprintf('Carregado %s alugueis da base de dados', count($rents))
-        );
+            Log::channel('app')->info(
+                sprintf('Carregado %s alugueis da base de dados', count($rents))
+            );
+        } catch (\Throwable $exception) {
+            Log::channel('error')->critical('Não foi possível carregar os alugueis do cliente',
+                [
+                    'erro'    => $exception->getMessage(),
+                    'cliente' => $customer
+                ]
+            );
+
+            return redirect()
+                ->route('home')
+                ->with('errors', 'Não foi possível acessar a página de alugueis de cliente');
+        }
 
         return view('customers.rents', compact('rents', 'customer'));
     }
