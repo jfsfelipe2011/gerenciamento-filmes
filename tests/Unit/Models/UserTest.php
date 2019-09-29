@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Models;
 
+use Prophecy\Prophecy\ObjectProphecy;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\User;
 use Carbon\Carbon;
 
@@ -20,7 +20,7 @@ class UserTest extends TestCase
     /** @var User */
     private $user;
 
-    /** @var Carbon */
+    /** @var Carbon|ObjectProphecy */
     private $carbon;
 
     public function setUp(): void
@@ -41,7 +41,7 @@ class UserTest extends TestCase
         $this->carbon->getTimezone()->willReturn('Europe/London');
         $this->carbon->getSettings()->willReturn(['value']);
     }
-    
+
     public function testPreencheCamposQueSaoFillables()
     {
         $this->user->fill($this->data);
