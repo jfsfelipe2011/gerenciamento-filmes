@@ -83,4 +83,22 @@ class CustomerController extends BaseApiController
 
         return Validator::make($data, $rules, $messages);
     }
+
+    public function show($document)
+    {
+        $customer = Customer::where('document', $document)->first();
+
+        if (!$customer instanceof Customer) {
+            return response()->json(['error' => 'Cliente não encontrado'], 404);
+        }
+
+        Log::channel('api')->info('Carregado cliente #{id} da base de dados', 
+            [
+                'id'      => $customer->id,
+                'cliente' => $customer
+            ]
+        );
+
+        return response()->json($customer, 200);
+    }
 }
