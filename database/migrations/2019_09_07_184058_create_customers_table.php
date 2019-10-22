@@ -17,7 +17,7 @@ class CreateCustomersTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('address');
-            $table->string('document');
+            $table->string('document')->unique();
             $table->enum('payment', [\App\Customer::VALID_PAYMENTS]);
             $table->timestamps();
         });

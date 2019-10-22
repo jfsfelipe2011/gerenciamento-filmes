@@ -58,6 +58,12 @@ return [
             'level'  => 'critical'
         ],
 
+        'api' => [
+            'driver' => 'single',
+            'path'   => storage_path('logs/api.log'),
+            'level'  => 'info'
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
