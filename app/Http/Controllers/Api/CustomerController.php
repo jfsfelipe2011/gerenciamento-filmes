@@ -86,7 +86,18 @@ class CustomerController extends BaseApiController
 
     public function show($document)
     {
-        $customer = Customer::where('document', $document)->first();
+        try {
+            $customer = Customer::where('document', $document)->first();
+        } catch (\Throwable $exception){
+            Log::channel('error')->critical('Não foi possível carregar o cliente',
+                [
+                    'erro'     => $exception->getMessage(),
+                    'document' => $document
+                ]
+            );
+
+            return $this->sendResponseStatus(false, 400, 'Erro ao carregar cliente');
+        }
 
         if (!$customer instanceof Customer) {
             return response()->json(['error' => 'Cliente não encontrado'], 404);
