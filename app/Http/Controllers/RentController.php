@@ -63,7 +63,7 @@ class RentController extends Controller
         try {
             $films = Film::find($data['films']);
 
-            if (!$films) {
+            if (count($films) === 0) {
                 throw new \Exception('Filme(s) informado não existem');
             }
 
@@ -82,9 +82,9 @@ class RentController extends Controller
                 $stock->quantity -= 1;
                 $stock->save();
 
-                Log::channel('app')->info('Estoque atualizado com sucesso', 
+                Log::channel('app')->info('Estoque atualizado com sucesso',
                     [
-                        'estoque'    => $stock, 
+                        'estoque'    => $stock,
                         'quantidade' => $stock->quantity
                     ]
                 );
@@ -207,9 +207,9 @@ class RentController extends Controller
                 $stock->quantity += 1;
                 $stock->save();
 
-                Log::channel('app')->info('Estoque atualizado com sucesso', 
+                Log::channel('app')->info('Estoque atualizado com sucesso',
                     [
-                        'estoque'    => $stock, 
+                        'estoque'    => $stock,
                         'quantidade' => $stock->quantity
                     ]
                 );
@@ -230,7 +230,7 @@ class RentController extends Controller
                 ->route('rents.index')
                 ->with('errors', 'Não foi possível cancelar o aluguel');
         }
-        
+
 
         return redirect()
             ->route('rents.index')
@@ -264,9 +264,9 @@ class RentController extends Controller
                 $stock->quantity += 1;
                 $stock->save();
 
-                Log::channel('app')->info('Estoque atualizado com sucesso', 
+                Log::channel('app')->info('Estoque atualizado com sucesso',
                     [
-                        'estoque'    => $stock, 
+                        'estoque'    => $stock,
                         'quantidade' => $stock->quantity
                     ]
                 );
@@ -286,7 +286,7 @@ class RentController extends Controller
             return redirect()
                 ->route('rents.index')
                 ->with('errors', 'Não foi possível finalizar o aluguel');
-        }    
+        }
 
         return redirect()
             ->route('rents.index')

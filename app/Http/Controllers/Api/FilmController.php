@@ -59,13 +59,17 @@ class FilmController extends BaseApiController
         return response()->json($result);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
         try {
             $film = (new Film())
                 ->where('id', (int) $id)
                 ->with(['category', 'actors', 'directors', 'stock'])
-                ->get();
+                ->first();
         } catch (\Throwable $exception){
             Log::channel('error')->critical('Não foi possível carregar o filme',
                 [
@@ -77,7 +81,7 @@ class FilmController extends BaseApiController
             return $this->sendResponseStatus(false, 400, 'Erro ao carregar filme');
         }
 
-        if (\count($film) === 0) {
+        if (!$film instanceof Film) {
             return response()->json(['error' => 'Filme não encontrado'], 404);
         }
 

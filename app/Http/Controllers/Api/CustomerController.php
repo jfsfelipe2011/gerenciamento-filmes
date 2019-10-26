@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Rent;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -15,10 +16,9 @@ use App\Customer;
 class CustomerController extends BaseApiController
 {
     /**
-     * Store a newly created resource in storage.
+     * @param Request $request
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -34,7 +34,7 @@ class CustomerController extends BaseApiController
             $customer = Customer::create($data);
 
             if ($customer instanceof Customer) {
-                Log::channel('api')->info('Criado novo cliente com sucesso', 
+                Log::channel('api')->info('Criado novo cliente com sucesso',
                     [
                         'cliente' => $customer
                     ]
@@ -53,6 +53,10 @@ class CustomerController extends BaseApiController
         }
     }
 
+    /**
+     * @param $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
     public function validateCustomer($data)
     {
         $messages = [
@@ -84,6 +88,10 @@ class CustomerController extends BaseApiController
         return Validator::make($data, $rules, $messages);
     }
 
+    /**
+     * @param $document
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($document)
     {
         try {
@@ -103,7 +111,7 @@ class CustomerController extends BaseApiController
             return response()->json(['error' => 'Cliente não encontrado'], 404);
         }
 
-        Log::channel('api')->info('Carregado cliente #{id} da base de dados', 
+        Log::channel('api')->info('Carregado cliente #{id} da base de dados',
             [
                 'id'      => $customer->id,
                 'cliente' => $customer
@@ -111,5 +119,41 @@ class CustomerController extends BaseApiController
         );
 
         return response()->json($customer, 200);
+    }
+
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function rents($id)
+    {
+        try {
+            $customer = Customer::find($id);
+
+            if (!$customer instanceof Customer) {
+                return response()->json(['error' => 'Cliente não encontrado'], 404);
+            }
+
+            $rents = (new Rent())
+                ->where('customer_id', $customer->id)
+                ->with(['customer', 'films'])
+                ->get();
+        } catch (\Throwable $exception){
+            Log::channel('error')->critical('Não foi possível carregar os alugueis do cliente #{id}',
+                [
+                    'erro'     => $exception->getMessage(),
+                    'id'       => $customer->id
+                ]
+            );
+
+            return $this->sendResponseStatus(false, 400, 'Erro ao carregar alugueis');
+        }
+
+        Log::channel('api')->info('Carregado {count} alugueis da base de dados', [
+            'count' => count($rents)
+        ]);
+
+        return response()->json($rents, 200);
     }
 }
