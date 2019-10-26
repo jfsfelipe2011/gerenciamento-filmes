@@ -16,3 +16,5 @@ use Illuminate\Http\Request;
 Route::post('/users', 'Api\CustomerController@store');
 Route::get('/users/{document}', 'Api\CustomerController@show');
 Route::get('/categories', 'Api\CategoryController@index');
+Route::get('/films', 'Api\FilmController@index');
+Route::get('/films/{id}', 'Api\FilmController@show');
