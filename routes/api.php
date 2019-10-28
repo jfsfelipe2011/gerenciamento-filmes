@@ -13,10 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('/customers', 'Api\CustomerController@store');
-Route::get('/customers/{document}', 'Api\CustomerController@show');
-Route::get('/categories', 'Api\CategoryController@index');
-Route::get('/films', 'Api\FilmController@index');
-Route::get('/films/{id}', 'Api\FilmController@show');
-Route::post('/rents', 'Api\RentController@store');
-Route::get('/customers/{id}/rents', 'Api\CustomerController@rents');
+Route::post('/customers', 'Api\CustomerController@store')->middleware('auth:api');
+Route::get('/customers/{document}', 'Api\CustomerController@show')->middleware('auth:api');
+Route::get('/categories', 'Api\CategoryController@index')->middleware('auth:api');
+Route::get('/films', 'Api\FilmController@index')->middleware('auth:api');
+Route::get('/films/{id}', 'Api\FilmController@show')->middleware('auth:api');
+Route::post('/rents', 'Api\RentController@store')->middleware('auth:api');
+Route::get('/customers/{id}/rents', 'Api\CustomerController@rents')->middleware('auth:api');
