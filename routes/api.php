@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 Route::post('/customers', 'Api\CustomerController@store')->middleware('auth:api');
 Route::get('/customers/{document}', 'Api\CustomerController@show')->middleware('auth:api');
 Route::get('/categories', 'Api\CategoryController@index')->middleware('auth:api');
+Route::get('/categories/{id}', 'Api\CategoryController@show')->middleware('auth:api');
 Route::get('/films', 'Api\FilmController@index')->middleware('auth:api');
 Route::get('/films/{id}', 'Api\FilmController@show')->middleware('auth:api');
 Route::post('/rents', 'Api\RentController@store')->middleware('auth:api');
